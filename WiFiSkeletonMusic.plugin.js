@@ -1,8 +1,8 @@
 /**
  * @name WiFiSkeletonMusic
  * @author iloveandmissmygf
- * @description Enhanced WiFiSkeleton background music player with advanced visualizer
- * @version 1.1.0
+ * @description Fixed WiFiSkeleton background music player
+ * @version 1.2.0
  * @authorId 1023772274446323713
  * @website https://github.com/justanewplayer19/WiFiSkeletonMusic
  * @source https://github.com/justanewplayer19/WiFiSkeletonMusic
@@ -16,20 +16,20 @@ module.exports = (() => {
                 name: "iloveandmissmygf",
                 discord_id: "1023772274446323713"
             }],
-            version: "1.1.0",
-            description: "Enhanced WiFiSkeleton background music player with advanced visualizer",
+            version: "1.2.0",
+            description: "Fixed WiFiSkeleton background music player with better error handling",
             github: "https://github.com/justanewplayer19/WiFiSkeletonMusic",
             github_raw: "https://raw.githubusercontent.com/justanewplayer19/WiFiSkeletonMusic/main/WiFiSkeletonMusic.plugin.js"
         },
         changelog: [
             {
-                title: "Enhanced Version",
+                title: "Fixed Version",
                 items: [
-                    "Advanced visualizer effects",
-                    "Improved UI with glitch effects",
-                    "Better animation effects",
-                    "Track progress bar",
-                    "Improved styling to match WiFiSkeleton aesthetic"
+                    "Fixed play button not working",
+                    "Better error handling and debugging",
+                    "Improved CORS handling",
+                    "Added connection status indicator",
+                    "Better user feedback"
                 ]
             }
         ]
@@ -59,71 +59,72 @@ module.exports = (() => {
         const plugin = (Plugin, Library) => {
             const { DiscordModules, WebpackModules, Patcher, Logger, Settings, Utilities, DOMTools } = Library;
 
-            // WiFiSkeleton playlist - using the user's actual tracks
+            // WiFiSkeleton playlist with better URLs and fallbacks
             const PLAYLIST = [
                 {
                     name: "pony",
                     url: "https://github.com/Justanewplayer19/WiFiSkeletonMusic/raw/refs/heads/main/pony.mp3",
+                    fallback: "https://raw.githubusercontent.com/Justanewplayer19/WiFiSkeletonMusic/main/pony.mp3",
                     duration: "1:25"
                 },
                 {
                     name: "2008",
                     url: "https://github.com/Justanewplayer19/WiFiSkeletonMusic/raw/refs/heads/main/2008.mp4",
+                    fallback: "https://raw.githubusercontent.com/Justanewplayer19/WiFiSkeletonMusic/main/2008.mp4",
                     duration: "1:08"
                 },
                 {
                     name: "im a monster in real life",
                     url: "https://github.com/Justanewplayer19/WiFiSkeletonMusic/raw/refs/heads/main/im%20a%20monster%20in%20your%20real%20life.mp3",
+                    fallback: "https://raw.githubusercontent.com/Justanewplayer19/WiFiSkeletonMusic/main/im%20a%20monster%20in%20your%20real%20life.mp3",
                     duration: "1:25"
                 },
                 {
                     name: "stop reminding me im human",
                     url: "https://github.com/Justanewplayer19/WiFiSkeletonMusic/raw/refs/heads/main/stop%20reminding%20me%20im%20human.mp3",
+                    fallback: "https://raw.githubusercontent.com/Justanewplayer19/WiFiSkeletonMusic/main/stop%20reminding%20me%20im%20human.mp3",
                     duration: "1:10"
-                },
-                {
-                    name: "2008",
-                    url: "https://github.com/Justanewplayer19/WiFiSkeletonMusic/raw/refs/heads/main/2008.mp4",
-                    duration: "1:08"
                 },
                 {
                     name: "stupid",
                     url: "https://github.com/Justanewplayer19/WiFiSkeletonMusic/raw/refs/heads/main/stupid.mp3",
+                    fallback: "https://raw.githubusercontent.com/Justanewplayer19/WiFiSkeletonMusic/main/stupid.mp3",
                     duration: "1:20"
                 },
                 {
                     name: "you ruin everything dont you",
                     url: "https://github.com/Justanewplayer19/WiFiSkeletonMusic/raw/refs/heads/main/you%20ruin%20everything%20dont%20you.mp3",
+                    fallback: "https://raw.githubusercontent.com/Justanewplayer19/WiFiSkeletonMusic/main/you%20ruin%20everything%20dont%20you.mp3",
                     duration: "1:02"
                 },
                 {
                     name: "ik your waiting....",
                     url: "https://github.com/Justanewplayer19/WiFiSkeletonMusic/raw/refs/heads/main/ik%20your%20waiting....mp3",
+                    fallback: "https://raw.githubusercontent.com/Justanewplayer19/WiFiSkeletonMusic/main/ik%20your%20waiting....mp3",
                     duration: "1:25"
-                },
-                {
-                    name: "im a monster in real life",
-                    url: "https://github.com/Justanewplayer19/WiFiSkeletonMusic/raw/refs/heads/main/birthday.mp3",
-                    duration: "1:19"
                 },
                 {
                     name: "birthday",
                     url: "https://github.com/Justanewplayer19/WiFiSkeletonMusic/raw/refs/heads/main/birthday.mp3",
+                    fallback: "https://raw.githubusercontent.com/Justanewplayer19/WiFiSkeletonMusic/main/birthday.mp3",
                     duration: "1:19"
                 },
                 {
                     name: "bipolar",
                     url: "https://github.com/Justanewplayer19/WiFiSkeletonMusic/raw/refs/heads/main/bipolar.mp3",
+                    fallback: "https://raw.githubusercontent.com/Justanewplayer19/WiFiSkeletonMusic/main/bipolar.mp3",
                     duration: "1:26"
                 },
                 {
                     name: "famous",
                     url: "https://github.com/Justanewplayer19/WiFiSkeletonMusic/raw/refs/heads/main/famous.mp3",
+                    fallback: "https://raw.githubusercontent.com/Justanewplayer19/WiFiSkeletonMusic/main/famous.mp3",
                     duration: "1:22"
                 },
                 {
                     name: "ugly",
                     url: "https://github.com/Justanewplayer19/WiFiSkeletonMusic/raw/refs/heads/main/ugly.mp3",
+                    fallback: "https://raw.githubusercontent.com/Justanewplayer19/WiFiSkeletonMusic/main/ugly.mp3",
                     duration: "2:33"
                 }
             ];
@@ -137,13 +138,13 @@ module.exports = (() => {
                     this.volume = 0.3;
                     this.controlsElement = null;
                     this.progressInterval = null;
+                    this.connectionStatus = "disconnected";
                     this.settings = {
                         autoplay: false,
                         volume: 30,
                         shuffle: false,
                         visualizer: true,
-                        glitchEffects: true,
-                        advancedVisualizer: true
+                        debug: true
                     };
                 }
 
@@ -153,12 +154,10 @@ module.exports = (() => {
                     this.createAudioPlayer();
                     this.createMusicControls();
                     this.addStyles();
-                    this.addFonts();
+                    this.testConnection();
                     
-                    if (this.settings.autoplay) {
-                        // Delay autoplay to respect browser policies
-                        setTimeout(() => this.playMusic(), 2000);
-                    }
+                    // Show helpful message
+                    BdApi.showToast("WiFiSkeleton Music loaded! Click play to start 🎵", { type: "info", timeout: 3000 });
                 }
 
                 onStop() {
@@ -181,29 +180,104 @@ module.exports = (() => {
                     BdApi.saveData("WiFiSkeletonMusic", "settings", this.settings);
                 }
 
+                async testConnection() {
+                    try {
+                        const testTrack = PLAYLIST[0];
+                        const response = await fetch(testTrack.url, { method: 'HEAD' });
+                        
+                        if (response.ok) {
+                            this.connectionStatus = "connected";
+                            this.updateConnectionStatus();
+                            if (this.settings.debug) {
+                                Logger.info("Connection test successful!");
+                            }
+                        } else {
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+                    } catch (error) {
+                        this.connectionStatus = "error";
+                        this.updateConnectionStatus();
+                        Logger.error("Connection test failed:", error);
+                        BdApi.showToast("⚠️ Connection to music files failed. Check your internet!", { type: "error", timeout: 5000 });
+                    }
+                }
+
+                updateConnectionStatus() {
+                    if (!this.controlsElement) return;
+                    
+                    const statusEl = this.controlsElement.querySelector('.wifiskeleton-status');
+                    if (statusEl) {
+                        statusEl.className = `wifiskeleton-status ${this.connectionStatus}`;
+                        statusEl.textContent = this.connectionStatus === "connected" ? "●" : 
+                                             this.connectionStatus === "error" ? "⚠" : "○";
+                    }
+                }
+
                 createAudioPlayer() {
                     this.audio = new Audio();
                     this.audio.volume = this.volume;
                     this.audio.loop = false;
-                    this.audio.crossOrigin = "anonymous";
+                    this.audio.preload = "none"; // Don't preload to avoid CORS issues
                     
+                    // Remove crossOrigin to avoid CORS issues
+                    // this.audio.crossOrigin = "anonymous";
+                    
+                    this.audio.addEventListener('loadstart', () => {
+                        if (this.settings.debug) Logger.info("Audio loading started");
+                        this.updateLoadingState(true);
+                    });
+
+                    this.audio.addEventListener('canplay', () => {
+                        if (this.settings.debug) Logger.info("Audio can play");
+                        this.updateLoadingState(false);
+                    });
+
                     this.audio.addEventListener('ended', () => {
+                        if (this.settings.debug) Logger.info("Audio ended");
                         this.nextTrack();
                     });
 
                     this.audio.addEventListener('error', (e) => {
                         Logger.error("Audio error:", e);
-                        BdApi.showToast("Failed to load audio track", { type: "error" });
+                        this.updateLoadingState(false);
+                        
+                        // Try fallback URL
+                        const currentTrackData = PLAYLIST[this.currentTrack];
+                        if (currentTrackData.fallback && this.audio.src !== currentTrackData.fallback) {
+                            Logger.info("Trying fallback URL...");
+                            this.audio.src = currentTrackData.fallback;
+                            this.audio.load();
+                            return;
+                        }
+                        
+                        BdApi.showToast(`❌ Failed to load: ${PLAYLIST[this.currentTrack].name}`, { type: "error" });
+                        this.nextTrack(); // Skip to next track
+                    });
+
+                    this.audio.addEventListener('play', () => {
+                        if (this.settings.debug) Logger.info("Audio started playing");
+                        this.isPlaying = true;
+                        this.updatePlayButton();
+                        this.startVisualizer();
+                        this.startProgressUpdate();
+                    });
+
+                    this.audio.addEventListener('pause', () => {
+                        if (this.settings.debug) Logger.info("Audio paused");
+                        this.isPlaying = false;
+                        this.updatePlayButton();
+                        this.stopVisualizer();
+                        this.stopProgressUpdate();
                     });
                 }
 
                 createMusicControls() {
                     const controlsHTML = `
-                        <div id="wifiskeleton-music-controls" class="wifiskeleton-controls ${this.settings.glitchEffects ? 'glitch-enabled' : ''}">
+                        <div id="wifiskeleton-music-controls" class="wifiskeleton-controls">
                             <div class="wifiskeleton-header">
                                 <div class="wifiskeleton-title-container">
+                                    <span class="wifiskeleton-status ${this.connectionStatus}">○</span>
                                     <span class="wifiskeleton-title">◆ WIFI SKELETON ◆</span>
-                                    ${this.settings.glitchEffects ? '<span class="wifiskeleton-title-glitch">◆ WIFI SKELETON ◆</span>' : ''}
                                 </div>
                                 <button class="wifiskeleton-minimize" title="Minimize">−</button>
                             </div>
@@ -231,7 +305,13 @@ module.exports = (() => {
                                     <input type="range" class="wifiskeleton-volume" min="0" max="100" value="${this.settings.volume}">
                                     <span class="wifiskeleton-volume-value">${this.settings.volume}%</span>
                                 </div>
-                                ${this.settings.visualizer ? this.createVisualizer() : ''}
+                                <div class="wifiskeleton-debug-row" style="display: ${this.settings.debug ? 'block' : 'none'}">
+                                    <div class="wifiskeleton-debug-info">
+                                        <span class="wifiskeleton-loading" style="display: none;">Loading...</span>
+                                        <button class="wifiskeleton-test-btn">Test Connection</button>
+                                    </div>
+                                </div>
+                                ${this.settings.visualizer ? '<div class="wifiskeleton-visualizer"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>' : ''}
                             </div>
                         </div>
                     `;
@@ -239,38 +319,7 @@ module.exports = (() => {
                     document.body.insertAdjacentHTML('beforeend', controlsHTML);
                     this.controlsElement = document.getElementById('wifiskeleton-music-controls');
                     this.attachControlEvents();
-                }
-
-                createVisualizer() {
-                    if (this.settings.advancedVisualizer) {
-                        return `
-                            <div class="wifiskeleton-visualizer advanced">
-                                <div class="bar-container">
-                                    <div class="bar"></div>
-                                    <div class="bar"></div>
-                                    <div class="bar"></div>
-                                    <div class="bar"></div>
-                                    <div class="bar"></div>
-                                    <div class="bar"></div>
-                                    <div class="bar"></div>
-                                    <div class="bar"></div>
-                                    <div class="bar"></div>
-                                    <div class="bar"></div>
-                                </div>
-                                <div class="wifiskeleton-visualizer-glitch"></div>
-                            </div>
-                        `;
-                    } else {
-                        return `
-                            <div class="wifiskeleton-visualizer">
-                                <div class="bar"></div>
-                                <div class="bar"></div>
-                                <div class="bar"></div>
-                                <div class="bar"></div>
-                                <div class="bar"></div>
-                            </div>
-                        `;
-                    }
+                    this.updateConnectionStatus();
                 }
 
                 attachControlEvents() {
@@ -311,6 +360,14 @@ module.exports = (() => {
                     controls.querySelector('.wifiskeleton-minimize').addEventListener('click', () => {
                         controls.classList.toggle('minimized');
                     });
+
+                    // Test connection button
+                    const testBtn = controls.querySelector('.wifiskeleton-test-btn');
+                    if (testBtn) {
+                        testBtn.addEventListener('click', () => {
+                            this.testConnection();
+                        });
+                    }
 
                     // Progress bar click
                     const progressBar = controls.querySelector('.wifiskeleton-progress-bar');
@@ -361,47 +418,68 @@ module.exports = (() => {
                     }
                 }
 
-                togglePlayPause() {
+                async togglePlayPause() {
                     if (this.isPlaying) {
                         this.pauseMusic();
                     } else {
-                        this.playMusic();
+                        await this.playMusic();
                     }
                 }
 
-                playMusic() {
-                    if (!this.audio.src || this.audio.src !== PLAYLIST[this.currentTrack].url) {
-                        this.audio.src = PLAYLIST[this.currentTrack].url;
-                    }
-                    
-                    this.audio.play().then(() => {
-                        this.isPlaying = true;
-                        this.updatePlayButton();
-                        this.startVisualizer();
-                        this.startProgressUpdate();
-                        this.triggerGlitchEffect();
-                        BdApi.showToast(`Now playing: ${PLAYLIST[this.currentTrack].name}`, { type: "info" });
-                    }).catch(error => {
+                async playMusic() {
+                    try {
+                        const currentTrackData = PLAYLIST[this.currentTrack];
+                        
+                        // Set up the audio source if needed
+                        if (!this.audio.src || this.audio.src !== currentTrackData.url) {
+                            if (this.settings.debug) Logger.info(`Loading track: ${currentTrackData.name}`);
+                            this.audio.src = currentTrackData.url;
+                            this.audio.load();
+                        }
+                        
+                        // Try to play
+                        await this.audio.play();
+                        
+                        BdApi.showToast(`🎵 Now playing: ${currentTrackData.name}`, { type: "success" });
+                        
+                    } catch (error) {
                         Logger.error("Playback failed:", error);
-                        BdApi.showToast("Click the play button to start music (browser policy)", { type: "warning" });
-                    });
+                        
+                        // Try fallback URL
+                        const currentTrackData = PLAYLIST[this.currentTrack];
+                        if (currentTrackData.fallback && this.audio.src !== currentTrackData.fallback) {
+                            try {
+                                Logger.info("Trying fallback URL...");
+                                this.audio.src = currentTrackData.fallback;
+                                this.audio.load();
+                                await this.audio.play();
+                                BdApi.showToast(`🎵 Now playing: ${currentTrackData.name} (fallback)`, { type: "success" });
+                                return;
+                            } catch (fallbackError) {
+                                Logger.error("Fallback also failed:", fallbackError);
+                            }
+                        }
+                        
+                        // Show user-friendly error message
+                        if (error.name === 'NotAllowedError') {
+                            BdApi.showToast("🔒 Browser blocked autoplay. Try clicking play again!", { type: "warning", timeout: 5000 });
+                        } else if (error.name === 'NotSupportedError') {
+                            BdApi.showToast("❌ Audio format not supported. Skipping track...", { type: "error" });
+                            this.nextTrack();
+                        } else {
+                            BdApi.showToast(`❌ Playback failed: ${error.message}`, { type: "error" });
+                        }
+                    }
                 }
 
                 pauseMusic() {
                     this.audio.pause();
-                    this.isPlaying = false;
-                    this.updatePlayButton();
-                    this.stopVisualizer();
-                    this.stopProgressUpdate();
                 }
 
                 stopMusic() {
                     if (this.audio) {
                         this.audio.pause();
                         this.audio.currentTime = 0;
-                        this.isPlaying = false;
-                        this.stopVisualizer();
-                        this.stopProgressUpdate();
                     }
                 }
 
@@ -412,7 +490,6 @@ module.exports = (() => {
                         this.currentTrack = (this.currentTrack + 1) % PLAYLIST.length;
                     }
                     this.updateTrackInfo();
-                    this.triggerGlitchEffect();
                     if (this.isPlaying) {
                         this.playMusic();
                     }
@@ -425,7 +502,6 @@ module.exports = (() => {
                         this.currentTrack = this.currentTrack === 0 ? PLAYLIST.length - 1 : this.currentTrack - 1;
                     }
                     this.updateTrackInfo();
-                    this.triggerGlitchEffect();
                     if (this.isPlaying) {
                         this.playMusic();
                     }
@@ -443,6 +519,23 @@ module.exports = (() => {
                         const playBtn = this.controlsElement.querySelector('.wifiskeleton-play');
                         playBtn.textContent = this.isPlaying ? '⏸' : '▶';
                         playBtn.title = this.isPlaying ? 'Pause' : 'Play';
+                    }
+                }
+
+                updateLoadingState(loading) {
+                    if (!this.controlsElement) return;
+                    
+                    const loadingEl = this.controlsElement.querySelector('.wifiskeleton-loading');
+                    const playBtn = this.controlsElement.querySelector('.wifiskeleton-play');
+                    
+                    if (loadingEl) {
+                        loadingEl.style.display = loading ? 'inline' : 'none';
+                    }
+                    
+                    if (playBtn && loading) {
+                        playBtn.textContent = '⏳';
+                    } else if (playBtn && !loading) {
+                        this.updatePlayButton();
                     }
                 }
 
@@ -494,11 +587,7 @@ module.exports = (() => {
 
                     this.visualizerInterval = setInterval(() => {
                         bars.forEach(bar => {
-                            // More dynamic height variation for advanced visualizer
-                            const height = this.settings.advancedVisualizer ? 
-                                Math.random() * 25 + (this.audio.volume * 20) : 
-                                Math.random() * 20 + 5;
-                                
+                            const height = Math.random() * 20 + 5;
                             bar.style.height = `${height}px`;
                         });
                     }, 100);
@@ -511,27 +600,11 @@ module.exports = (() => {
                     }
                 }
 
-                triggerGlitchEffect() {
-                    if (!this.settings.glitchEffects || !this.controlsElement) return;
-                    
-                    this.controlsElement.classList.add('glitch-trigger');
-                    setTimeout(() => {
-                        this.controlsElement.classList.remove('glitch-trigger');
-                    }, 500);
-                }
-
                 removeMusicControls() {
                     if (this.controlsElement) {
                         this.controlsElement.remove();
                         this.controlsElement = null;
                     }
-                }
-
-                addFonts() {
-                    const fontLink = document.createElement('link');
-                    fontLink.rel = 'stylesheet';
-                    fontLink.href = 'https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap';
-                    document.head.appendChild(fontLink);
                 }
 
                 addStyles() {
@@ -543,12 +616,11 @@ module.exports = (() => {
                             width: 300px;
                             background: linear-gradient(135deg, rgba(5, 5, 5, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%);
                             border: 2px solid #ff4444;
-                            font-family: 'VT323', 'Share Tech Mono', monospace;
+                            font-family: 'VT323', monospace;
                             color: #ffffff;
                             z-index: 10000;
                             backdrop-filter: blur(10px);
                             box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
-                            transition: all 0.3s ease;
                         }
 
                         .wifiskeleton-controls.minimized .wifiskeleton-content {
@@ -562,12 +634,32 @@ module.exports = (() => {
                             justify-content: space-between;
                             align-items: center;
                             cursor: move;
-                            position: relative;
-                            overflow: hidden;
                         }
 
                         .wifiskeleton-title-container {
-                            position: relative;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        }
+
+                        .wifiskeleton-status {
+                            font-size: 12px;
+                            font-weight: bold;
+                        }
+
+                        .wifiskeleton-status.connected {
+                            color: #00ff00;
+                            text-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
+                        }
+
+                        .wifiskeleton-status.error {
+                            color: #ffff00;
+                            text-shadow: 0 0 5px rgba(255, 255, 0, 0.8);
+                        }
+
+                        .wifiskeleton-status.disconnected {
+                            color: #ff0000;
+                            text-shadow: 0 0 5px rgba(255, 0, 0, 0.8);
                         }
 
                         .wifiskeleton-title {
@@ -575,27 +667,6 @@ module.exports = (() => {
                             font-weight: bold;
                             letter-spacing: 2px;
                             text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
-                        }
-
-                        .wifiskeleton-title-glitch {
-                            position: absolute;
-                            top: 0;
-                            left: 0;
-                            font-size: 16px;
-                            font-weight: bold;
-                            letter-spacing: 2px;
-                            color: #0ff;
-                            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
-                            clip: rect(0, 900px, 0, 0);
-                            opacity: 0.8;
-                        }
-
-                        .wifiskeleton-controls.glitch-enabled .wifiskeleton-title-glitch {
-                            animation: glitch 3s infinite;
-                        }
-
-                        .wifiskeleton-controls.glitch-trigger .wifiskeleton-title-glitch {
-                            animation: glitch 0.5s steps(2) infinite;
                         }
 
                         .wifiskeleton-minimize {
@@ -607,17 +678,14 @@ module.exports = (() => {
                             cursor: pointer;
                             font-family: monospace;
                             font-size: 16px;
-                            transition: all 0.2s ease;
                         }
 
                         .wifiskeleton-minimize:hover {
                             background: rgba(255, 255, 255, 0.2);
-                            transform: scale(1.1);
                         }
 
                         .wifiskeleton-content {
                             padding: 15px;
-                            position: relative;
                         }
 
                         .wifiskeleton-track-info {
@@ -630,14 +698,11 @@ module.exports = (() => {
                             color: #ff4444;
                             margin-bottom: 8px;
                             text-shadow: 0 0 5px rgba(255, 68, 68, 0.5);
-                            font-family: 'VT323', monospace;
-                            letter-spacing: 1px;
                         }
 
                         .wifiskeleton-track-duration {
                             font-size: 14px;
                             color: #cccccc;
-                            font-family: 'Share Tech Mono', monospace;
                         }
 
                         .wifiskeleton-progress-container {
@@ -655,26 +720,7 @@ module.exports = (() => {
                             height: 100%;
                             background: linear-gradient(90deg, #ff4444, #ff6666);
                             width: 0%;
-                            position: relative;
-                        }
-
-                        .wifiskeleton-progress-fill::after {
-                            content: '';
-                            position: absolute;
-                            right: -4px;
-                            top: -4px;
-                            width: 12px;
-                            height: 12px;
-                            background: #ff4444;
-                            border: 2px solid #ffffff;
-                            border-radius: 50%;
-                            box-shadow: 0 0 10px rgba(255, 68, 68, 0.8);
-                            opacity: 0;
-                            transition: opacity 0.2s ease;
-                        }
-
-                        .wifiskeleton-progress-bar:hover .wifiskeleton-progress-fill::after {
-                            opacity: 1;
+                            transition: width 0.1s ease;
                         }
 
                         .wifiskeleton-controls-row {
@@ -692,24 +738,7 @@ module.exports = (() => {
                             height: 40px;
                             cursor: pointer;
                             font-size: 16px;
-                            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-                            position: relative;
-                            overflow: hidden;
-                        }
-
-                        .wifiskeleton-btn::before {
-                            content: '';
-                            position: absolute;
-                            top: 0;
-                            left: -100%;
-                            width: 100%;
-                            height: 100%;
-                            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-                            transition: left 0.5s;
-                        }
-
-                        .wifiskeleton-btn:hover::before {
-                            left: 100%;
+                            transition: all 0.3s ease;
                         }
 
                         .wifiskeleton-btn:hover {
@@ -734,7 +763,6 @@ module.exports = (() => {
                             font-size: 14px;
                             color: #ff4444;
                             min-width: 40px;
-                            font-family: 'Share Tech Mono', monospace;
                         }
 
                         .wifiskeleton-volume {
@@ -755,7 +783,6 @@ module.exports = (() => {
                             cursor: pointer;
                             border-radius: 0;
                             box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
-                            border: 2px solid rgba(255, 255, 255, 0.5);
                         }
 
                         .wifiskeleton-volume-value {
@@ -763,7 +790,38 @@ module.exports = (() => {
                             color: #cccccc;
                             min-width: 45px;
                             text-align: right;
-                            font-family: 'Share Tech Mono', monospace;
+                        }
+
+                        .wifiskeleton-debug-row {
+                            margin-bottom: 15px;
+                            padding: 10px;
+                            background: rgba(255, 68, 68, 0.1);
+                            border-left: 3px solid #ff4444;
+                        }
+
+                        .wifiskeleton-debug-info {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            font-size: 12px;
+                        }
+
+                        .wifiskeleton-test-btn {
+                            background: rgba(255, 68, 68, 0.3);
+                            border: 1px solid #ff4444;
+                            color: white;
+                            padding: 4px 8px;
+                            cursor: pointer;
+                            font-size: 11px;
+                        }
+
+                        .wifiskeleton-test-btn:hover {
+                            background: rgba(255, 68, 68, 0.5);
+                        }
+
+                        .wifiskeleton-loading {
+                            color: #ffff00;
+                            animation: pulse 1s infinite;
                         }
 
                         .wifiskeleton-visualizer {
@@ -772,7 +830,6 @@ module.exports = (() => {
                             align-items: flex-end;
                             gap: 4px;
                             height: 30px;
-                            position: relative;
                         }
 
                         .wifiskeleton-visualizer .bar {
@@ -782,162 +839,9 @@ module.exports = (() => {
                             height: 5px;
                         }
 
-                        .wifiskeleton-visualizer.advanced {
-                            height: 40px;
-                            background: rgba(0, 0, 0, 0.3);
-                            border: 1px solid rgba(255, 68, 68, 0.3);
-                            padding: 5px;
-                            position: relative;
-                            overflow: hidden;
-                        }
-
-                        .wifiskeleton-visualizer.advanced .bar-container {
-                            display: flex;
-                            justify-content: center;
-                            align-items: flex-end;
-                            gap: 4px;
-                            height: 100%;
-                            width: 100%;
-                            position: relative;
-                            z-index: 2;
-                        }
-
-                        .wifiskeleton-visualizer.advanced .bar {
-                            width: 6px;
-                            background: linear-gradient(to top, #ff4444, #ff6666);
-                            box-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
-                        }
-
-                        .wifiskeleton-visualizer-glitch {
-                            position: absolute;
-                            top: 0;
-                            left: 0;
-                            width: 100%;
-                            height: 100%;
-                            background: linear-gradient(transparent 50%, rgba(255, 68, 68, 0.1) 50%);
-                            background-size: 100% 4px;
-                            z-index: 1;
-                            pointer-events: none;
-                            animation: scanlines 0.05s linear infinite;
-                        }
-
-                        /* Glitch animations */
-                        @keyframes glitch {
-                            0% {
-                                clip: rect(31px, 9999px, 94px, 0);
-                                transform: skew(0.5deg);
-                            }
-                            5% {
-                                clip: rect(70px, 9999px, 46px, 0);
-                                transform: skew(0.8deg);
-                            }
-                            10% {
-                                clip: rect(13px, 9999px, 76px, 0);
-                                transform: skew(0.3deg);
-                            }
-                            15% {
-                                clip: rect(89px, 9999px, 25px, 0);
-                                transform: skew(0.1deg);
-                            }
-                            20% {
-                                clip: rect(45px, 9999px, 64px, 0);
-                                transform: skew(0.6deg);
-                            }
-                            25% {
-                                clip: rect(5px, 9999px, 87px, 0);
-                                transform: skew(0.4deg);
-                            }
-                            30% {
-                                clip: rect(82px, 9999px, 31px, 0);
-                                transform: skew(0.2deg);
-                            }
-                            35% {
-                                clip: rect(28px, 9999px, 95px, 0);
-                                transform: skew(0.7deg);
-                            }
-                            40% {
-                                clip: rect(66px, 9999px, 42px, 0);
-                                transform: skew(0.9deg);
-                            }
-                            45% {
-                                clip: rect(10px, 9999px, 87px, 0);
-                                transform: skew(0.3deg);
-                            }
-                            50% {
-                                clip: rect(52px, 9999px, 35px, 0);
-                                transform: skew(0.5deg);
-                            }
-                            55% {
-                                clip: rect(19px, 9999px, 92px, 0);
-                                transform: skew(0.8deg);
-                            }
-                            60% {
-                                clip: rect(34px, 9999px, 23px, 0);
-                                transform: skew(0.2deg);
-                            }
-                            65% {
-                                clip: rect(75px, 9999px, 54px, 0);
-                                transform: skew(0.6deg);
-                            }
-                            70% {
-                                clip: rect(57px, 9999px, 81px, 0);
-                                transform: skew(0.1deg);
-                            }
-                            75% {
-                                clip: rect(40px, 9999px, 17px, 0);
-                                transform: skew(0.4deg);
-                            }
-                            80% {
-                                clip: rect(26px, 9999px, 68px, 0);
-                                transform: skew(0.7deg);
-                            }
-                            85% {
-                                clip: rect(48px, 9999px, 93px, 0);
-                                transform: skew(0.9deg);
-                            }
-                            90% {
-                                clip: rect(54px, 9999px, 30px, 0);
-                                transform: skew(0.3deg);
-                            }
-                            95% {
-                                clip: rect(62px, 9999px, 79px, 0);
-                                transform: skew(0.5deg);
-                            }
-                            100% {
-                                clip: rect(39px, 9999px, 41px, 0);
-                                transform: skew(0.1deg);
-                            }
-                        }
-
-                        @keyframes scanlines {
-                            0% { transform: translateY(0); }
-                            100% { transform: translateY(4px); }
-                        }
-
-                        /* Glitch trigger effect */
-                        .wifiskeleton-controls.glitch-trigger {
-                            transform: translate(2px, 0);
-                            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-                        }
-
-                        @keyframes shake {
-                            0%, 100% { transform: translate(0, 0); }
-                            10%, 30%, 50%, 70%, 90% { transform: translate(-2px, 0); }
-                            20%, 40%, 60%, 80% { transform: translate(2px, 0); }
-                        }
-
-                        /* Add a subtle VHS effect to the entire player */
-                        .wifiskeleton-controls::after {
-                            content: "";
-                            position: absolute;
-                            top: 0;
-                            left: 0;
-                            width: 100%;
-                            height: 100%;
-                            background: linear-gradient(rgba(255, 0, 0, 0.03), rgba(0, 255, 255, 0.03));
-                            pointer-events: none;
-                            z-index: 9999;
-                            opacity: 0.3;
+                        @keyframes pulse {
+                            0%, 100% { opacity: 1; }
+                            50% { opacity: 0.5; }
                         }
                     `;
 
@@ -951,67 +855,49 @@ module.exports = (() => {
                 getSettingsPanel() {
                     const panel = document.createElement("div");
                     panel.innerHTML = `
-                        <div style="padding: 20px; font-family: 'VT323', monospace; color: #ff4444; background: rgba(10, 10, 10, 0.9);">
-                            <h2 style="text-align: center; margin-bottom: 20px; text-shadow: 0 0 5px rgba(255, 68, 68, 0.5);">◆ WIFI SKELETON MUSIC SETTINGS ◆</h2>
-                            
-                            <div style="background: rgba(255, 68, 68, 0.1); padding: 15px; margin-bottom: 20px; border-left: 3px solid #ff4444;">
-                                <label style="display: flex; align-items: center; margin-bottom: 15px;">
-                                    <input type="checkbox" id="autoplay" ${this.settings.autoplay ? 'checked' : ''}> 
-                                    <span style="margin-left: 10px;">Auto-play on startup</span>
-                                </label>
-                                
-                                <label style="display: flex; align-items: center; margin-bottom: 15px;">
-                                    <input type="checkbox" id="visualizer" ${this.settings.visualizer ? 'checked' : ''}> 
-                                    <span style="margin-left: 10px;">Show visualizer</span>
-                                </label>
-                                
-                                <label style="display: flex; align-items: center; margin-bottom: 15px;">
-                                    <input type="checkbox" id="advancedVisualizer" ${this.settings.advancedVisualizer ? 'checked' : ''}> 
-                                    <span style="margin-left: 10px;">Use advanced visualizer</span>
-                                </label>
-                                
-                                <label style="display: flex; align-items: center;">
-                                    <input type="checkbox" id="glitchEffects" ${this.settings.glitchEffects ? 'checked' : ''}> 
-                                    <span style="margin-left: 10px;">Enable glitch effects</span>
-                                </label>
-                            </div>
-                            
-                            <p style="color: #cccccc; font-size: 14px; line-height: 1.5; text-align: center;">
-                                Note: Due to browser policies, music may require user interaction to start.
-                                <br>Your WiFiSkeleton tracks are loaded from your GitHub repository.
+                        <div style="padding: 20px; font-family: 'VT323', monospace; color: #ff4444;">
+                            <h2>◆ WIFI SKELETON MUSIC SETTINGS ◆</h2>
+                            <br>
+                            <label>
+                                <input type="checkbox" id="autoplay" ${this.settings.autoplay ? 'checked' : ''}> 
+                                Auto-play on startup
+                            </label>
+                            <br><br>
+                            <label>
+                                <input type="checkbox" id="visualizer" ${this.settings.visualizer ? 'checked' : ''}> 
+                                Show visualizer
+                            </label>
+                            <br><br>
+                            <label>
+                                <input type="checkbox" id="debug" ${this.settings.debug ? 'checked' : ''}> 
+                                Show debug info
+                            </label>
+                            <br><br>
+                            <p style="color: #cccccc; font-size: 12px;">
+                                🔧 TROUBLESHOOTING:<br>
+                                • If play button doesn't work, try clicking it twice<br>
+                                • Check the connection status indicator (● = good, ⚠ = error)<br>
+                                • Use "Test Connection" button to check if files are accessible<br>
+                                • Make sure your internet connection is stable
                             </p>
                         </div>
                     `;
 
-                    // Autoplay setting
                     panel.querySelector('#autoplay').addEventListener('change', (e) => {
                         this.settings.autoplay = e.target.checked;
                         this.saveSettings();
                     });
 
-                    // Visualizer setting
                     panel.querySelector('#visualizer').addEventListener('change', (e) => {
                         this.settings.visualizer = e.target.checked;
                         this.saveSettings();
                         this.recreateControls();
                     });
 
-                    // Advanced visualizer setting
-                    panel.querySelector('#advancedVisualizer').addEventListener('change', (e) => {
-                        this.settings.advancedVisualizer = e.target.checked;
+                    panel.querySelector('#debug').addEventListener('change', (e) => {
+                        this.settings.debug = e.target.checked;
                         this.saveSettings();
-                        if (this.settings.visualizer) {
-                            this.recreateControls();
-                        }
-                    });
-
-                    // Glitch effects setting
-                    panel.querySelector('#glitchEffects').addEventListener('change', (e) => {
-                        this.settings.glitchEffects = e.target.checked;
-                        this.saveSettings();
-                        if (this.controlsElement) {
-                            this.controlsElement.classList.toggle('glitch-enabled', this.settings.glitchEffects);
-                        }
+                        this.recreateControls();
                     });
 
                     return panel;
